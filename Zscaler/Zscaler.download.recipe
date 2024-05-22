@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Description</key>
+    <string>Downloads the specified version of Zscaler installer</string>
+    <key>Identifier</key>
+    <string>com.github.sysco.download.ZscalerInstaller</string>
+    <key>Input</key>
+    <dict>
+        <key>NAME</key>
+        <string>Zscaler Installer</string>
+        <key>installerversion</key>
+        <string>4.2.0.262</string>
+    </dict>
+    <key>MinimumVersion</key>
+    <string>0.5.0</string>
+    <key>Process</key>
+    <array>
+        <dict>
+            <key>Arguments</key>
+            <dict>
+                <key>filename</key>
+                <string>Zscaler-osx-%installerversion%-installer.pkg</string>
+                <key>url</key>
+                <string>https://d32a6ru7mhaq0c.cloudfront.net/Zscaler-osx-%installerversion%-installer.pkg</string>
+            </dict>
+            <key>Processor</key>
+            <string>URLDownloader</string>
+        </dict>
+        <dict>
+            <key>Arguments</key>
+            <dict>
+                <key>expected_authority_names</key>
+                <array>
+                    <string>Developer ID Installer: Zscaler, Inc. (4B8J598M7U)</string>
+                    <string>Developer ID Certification Authority</string>
+                    <string>Apple Root CA</string>
+                </array>
+                <key>input_path</key>
+                <string>%pathname%/*.pkg</string>
+            </dict>
+            <key>Processor</key>
+            <string>CodeSignatureVerifier</string>
+        </dict>
+    </array>
+</dict>
+</plist>
