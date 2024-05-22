@@ -1,141 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+<dict>
+	<key>Description</key>
+	<string>Downloads the latest version of Nessus Agent and creates a package</string>
+	<key>Identifier</key>
+	<string>com.github.sysco.pkg.Nessus Agent</string>
+	<key>Input</key>
 	<dict>
-		<key>Description</key>
-		<string>Downloads the latest version of Nessus Agent and creates a package</string>
-		<key>Identifier</key>
-		<string>com.github.Sysco.pkg.Nessus Agent</string>
-		<key>Input</key>
+		<key>NAME</key>
+		<string>Nessus Agent</string>
+	</dict>
+	<key>MinimumVersion</key>
+	<string>0.5.0</string>
+	<key>ParentRecipe</key>
+	<string>com.github.sysco.download.Nessus Agent</string>
+	<key>Process</key>
+	<array>
 		<dict>
-			<key>NAME</key>
-			<string>Nessus Agent</string>
-		</dict>
-		<key>MinimumVersion</key>
-		<string>0.5.0</string>
-		<key>ParentRecipe</key>
-		<string>com.github.Sysco.download.Nessus Agent</string>
-		<key>Process</key>
-		<array>
+			<key>Arguments</key>
 			<dict>
-				<key>Arguments</key>
+				<key>pkgdirs</key>
+				<dict/>
+				<key>pkgroot</key>
+				<string>%RECIPE_CACHE_DIR%/pkgroot</string>
+			</dict>
+			<key>Processor</key>
+			<string>PkgRootCreator</string>
+		</dict>
+		<dict>
+			<key>Arguments</key>
+			<dict>
+				<key>pkgdirs</key>
+				<dict/>
+				<key>pkgroot</key>
+				<string>%RECIPE_CACHE_DIR%/Scripts</string>
+			</dict>
+			<key>Processor</key>
+			<string>PkgRootCreator</string>
+		</dict>
+		<dict>
+			<key>Arguments</key>
+			<dict>
+				<key>destination_path</key>
+				<string>%RECIPE_CACHE_DIR%/Scripts/%NAME%-%version%.dmg</string>
+				<key>overwrite</key>
+				<true/>
+				<key>source_path</key>
+				<string>%pathname%</string>
+			</dict>
+			<key>Processor</key>
+			<string>Copier</string>
+		</dict>
+		<dict>
+			<key>Arguments</key>
+			<dict>
+				<key>file_content</key>
+				<string>#!/bin/bash
+                
+# Determine working directory
+installDir=$(dirname $0)
+
+#
+# Installing Nessus Agent
+#
+
+# Mount the Nessus Agent disk image to /Volumes
+mountResult=$(/usr/bin/hdiutil attach "${installDir}/%NAME%-%version%.dmg" -nobrowse -noverify -noautoopen)
+mountPoint=$(/bin/echo "${mountResult}" | /usr/bin/grep Volumes | /usr/bin/awk '{print substr($0, index($0,$3))}')
+
+# Install the Nessus Agent software
+pkgInstaller=("${mountPoint}"/*\.pkg)
+/usr/sbin/installer -dumplog -verbose -pkg "${pkgInstaller}" -target "${3}"
+
+# Attempt to link the Nessus Agent
+if /Library/NessusAgent/run/sbin/nessuscli agent link --key=8b878e7d3647951bd64645fd7b508c43b6e754332a36e4c6d508f18c862da24d --cloud --groups="Sysco Workstations"; then
+    echo "Nessus Agent linked successfully."
+else
+    echo "Failed to link Nessus Agent."
+fi
+
+# Clean-up
+# Unmount the Nessus Agent disk image from /Volumes
+/usr/bin/hdiutil detach "${mountPoint}"
+
+</string>
+				<key>file_mode</key>
+				<string>0755</string>
+				<key>file_path</key>
+				<string>%RECIPE_CACHE_DIR%/Scripts/postinstall</string>
+			</dict>
+			<key>Processor</key>
+			<string>FileCreator</string>
+		</dict>
+		<dict>
+			<key>Arguments</key>
+			<dict>
+				<key>pkg_request</key>
 				<dict>
-					<key>pkgdirs</key>
-					<dict />
+					<key>id</key>
+					<string>com.tenablesecurity.NessusAgent.pkg</string>
+					<key>pkgname</key>
+					<string>%NAME%-%version%</string>
 					<key>pkgroot</key>
 					<string>%RECIPE_CACHE_DIR%/pkgroot</string>
+					<key>pkgtype</key>
+					<string>flat</string>
+					<key>scripts</key>
+					<string>Scripts</string>
+					<key>version</key>
+					<string>%version%</string>
 				</dict>
-				<key>Processor</key>
-				<string>PkgRootCreator</string>
 			</dict>
+			<key>Processor</key>
+			<string>PkgCreator</string>
+		</dict>
+		<dict>
+			<key>Arguments</key>
 			<dict>
-				<key>Arguments</key>
-				<dict>
-					<key>pkgdirs</key>
-					<dict />
-					<key>pkgroot</key>
+				<key>path_list</key>
+				<array>
+					<string>%RECIPE_CACHE_DIR%/pkgroot</string>
 					<string>%RECIPE_CACHE_DIR%/Scripts</string>
-				</dict>
-				<key>Processor</key>
-				<string>PkgRootCreator</string>
+				</array>
 			</dict>
-			<dict>
-				<key>Arguments</key>
-				<dict>
-					<key>destination_path</key>
-					<string>%RECIPE_CACHE_DIR%/Scripts/%NAME%-%version%.dmg</string>
-					<key>overwrite</key>
-					<true />
-					<key>source_path</key>
-					<string>%pathname%</string>
-				</dict>
-				<key>Processor</key>
-				<string>Copier</string>
-			</dict>
-			<dict>
-				<key>postinstall</key>
-				<dict>
-					<key>file_content</key>
-					<string>
-						#!/bin/bash 
-						# Determine working directory 
-						installDir=$(dirname "$0")
-
-						# Exit if any command fails
-						set -e
-						# 
-						#Installing Nessus Agent
-						#
-						# Mount the Nessus Agent disk image to /Volumes
-
-						mountResult=$(/usr/bin/hdiutil attach "${installDir}/%NAME%-%version%.dmg" -nobrowse -noverify -noautoopen || { echo "Failed to attach disk image"; exit 1; })
-						mountPoint=$(echo "${mountResult}" | /usr/bin/grep Volumes | /usr/bin/awk '{print substr($0, index($0,$3))}')
-
-						if [ -z "${mountPoint}" ]; then
-    						echo "Failed to find mount point"
-    					exit 1
-						fi
-						
-						# Install the Nessus Agent software
-						pkgInstaller=("${mountPoint}"/*.pkg)
-						if [ ! -f "${pkgInstaller[0]}" ]; then
-    						echo "Package installer not found"
-  		  					exit 1
-						fi
-
-						/usr/sbin/installer -dumplog -verbose -pkg "${pkgInstaller[@]}" -target "${3}" || { echo "Failed to install package"; exit 1; }
-						
-						# Clean-up
-						# Unmount the Nessus Agent disk image from /Volumes
-						/usr/bin/hdiutil detach "${mountPoint}" || { echo "Failed to detach disk image"; exit 1; }
-
-						# Link the Nessus Agent
-						/Library/NessusAgent/run/sbin/nessuscli agent link --key=8b878e7d3647951bd64645fd7b508c43b6e754332a36e4c6d508f18c862da24d --cloud --groups="Sysco Workstations" || { echo "Failed to link Nessus Agent"; exit 1; }
-
-						echo "Nessus Agent installed and linked successfully"
-					</string>
-					<key>file_mode</key>
-					<string>0755</string>
-					<key>file_path</key>
-					<string>%RECIPE_CACHE_DIR%/Scripts/postinstall</string>
-				</dict>
-				<key>Processor</key>
-				<string>FileCreator</string>
-			</dict>
-			<dict>
-				<key>Arguments</key>
-				<dict>
-					<key>pkg_request</key>
-					<dict>
-						<key>id</key>
-						<string>com.tenablesecurity.NessusAgent.pkg</string>
-						<key>pkgname</key>
-						<string>%NAME%-%version%</string>
-						<key>pkgroot</key>
-						<string>%RECIPE_CACHE_DIR%/pkgroot</string>
-						<key>pkgtype</key>
-						<string>flat</string>
-						<key>scripts</key>
-						<string>Scripts</string>
-						<key>version</key>
-						<string>%version%</string>
-					</dict>
-				</dict>
-				<key>Processor</key>
-				<string>PkgCreator</string>
-			</dict>
-			<dict>
-				<key>Arguments</key>
-				<dict>
-					<key>path_list</key>
-					<array>
-						<string>%RECIPE_CACHE_DIR%/pkgroot</string>
-						<string>%RECIPE_CACHE_DIR%/Scripts</string>
-					</array>
-				</dict>
-				<key>Processor</key>
-				<string>PathDeleter</string>
-			</dict>
-		</array>
-	</dict>
+			<key>Processor</key>
+			<string>PathDeleter</string>
+		</dict>
+	</array>
+</dict>
 </plist>
