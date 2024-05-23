@@ -266,17 +266,6 @@ exit 0
 			</dict>
 			<dict>
 				<key>Processor</key>
-				<string>com.github.hikingguy43.SharedProcessors/RenamePath</string>
-				<key>Arguments</key>
-				<dict>
-					<key>source_path</key>
-					<string>%RECIPE_CACHE_DIR%/%NAME%-%version%.pkg</string>
-					<key>new_name</key>
-					<string>%RECIPE_CACHE_DIR%/%PKG_NAME%-%version%.pkg</string>
-				</dict>
-			</dict>
-			<dict>
-				<key>Processor</key>
 				<string>PathDeleter</string>
 				<key>Arguments</key>
 				<dict>
