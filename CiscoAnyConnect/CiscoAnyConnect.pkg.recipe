@@ -31,12 +31,12 @@
                     <key>Profiles</key>
                     <dict>
                         <key>mode</key>
-                        <integer>0755</integer>
+                        <string>0755</string>
                     </dict>
                     <key>Profiles/vpn</key>
                     <dict>
                         <key>mode</key>
-                        <integer>0755</integer>
+                        <string>0755</string>
                     </dict>
                 </dict>
             </dict>
