@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <recipe xmlns="http://autopkg.github.io/autopkg/recipe">
-    <identifier>com.github.grahampugh.recipes.pkg.CiscoAnyConnect</identifier>
+    <identifier>com.github.sysco.recipes.pkg.CiscoAnyConnect</identifier>
     <minimum_version>2.3</minimum_version>
     <description>Creates a Cisco AnyConnect VPN-only package.</description>
     <input>
