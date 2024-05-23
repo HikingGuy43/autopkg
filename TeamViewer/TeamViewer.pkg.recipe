@@ -7,7 +7,7 @@
 
 Set the DERIVE_MIN_OS variable to a non-empty string to set the minimum_os_version via MunkiInstallsItemsCreator. This requires a minimum AutoPkg version of 2.7 please update if you're not already running it.</string>
 	<key>Identifier</key>
-	<string>io.github.hjuutilainen.pkg.TeamViewer</string>
+	<string>io.github.sysco.pkg.TeamViewer</string>
 	<key>Input</key>
 	<dict>
 		<key>DERIVE_MIN_OS</key>
@@ -18,7 +18,7 @@ Set the DERIVE_MIN_OS variable to a non-empty string to set the minimum_os_versi
 	<key>MinimumVersion</key>
 	<string>2.7</string>
 	<key>ParentRecipe</key>
-	<string>io.github.hjuutilainen.download.TeamViewer</string>
+	<string>io.github.sysco.download.TeamViewer</string>
 	<key>Process</key>
 	<array>
 		<dict>
@@ -68,14 +68,6 @@ Set the DERIVE_MIN_OS variable to a non-empty string to set the minimum_os_versi
 				<key>derive_minimum_os_version</key>
 				<string>%DERIVE_MIN_OS%</string>
 			</dict>
-			<key>Processor</key>
-			<string>MunkiInstallsItemsCreator</string>
-		</dict>
-		<dict>
-			<key>Arguments</key>
-			<dict/>
-			<key>Processor</key>
-			<string>MunkiPkginfoMerger</string>
 		</dict>
 		<dict>
 			<key>Arguments</key>
