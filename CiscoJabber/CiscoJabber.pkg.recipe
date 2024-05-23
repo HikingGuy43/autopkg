@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Description</key>
+    <string>Packages Cisco Jabber into a .pkg</string>
+    <key>Identifier</key>
+    <string>com.github.sysco.pkg.ciscojabber</string>
+    <key>Input</key>
+    <dict>
+        <key>NAME</key>
+        <string>Cisco Jabber</string>
+    </dict>
+    <key>MinimumVersion</key>
+    <string>2.0.0</string>
+    <key>ParentRecipe</key>
+    <string>com.github.sysco.download.ciscojabber</string>
+    <key>Process</key>
+    <array>
+        <dict>
+            <key>Processor</key>
+            <string>PkgRootCreator</string>
+            <key>Arguments</key>
+            <dict>
+                <key>pkgroot</key>
+                <string>%RECIPE_CACHE_DIR%/%NAME%</string>
+                <key>pkgdirs</key>
+                <dict>
+                    <key>Applications</key>
+                    <dict>
+                        <key>mode</key>
+                        <integer>0755</integer>
+                    </dict>
+                </dict>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>Copier</string>
+            <key>Arguments</key>
+            <dict>
+                <key>source_path</key>
+                <string>%pathname%</string>
+                <key>destination_path</key>
+                <string>%pkgroot%/Applications/%NAME%.app</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>PkgCreator</string>
+            <key>Arguments</key>
+            <dict>
+                <key>pkg_request</key>
+                <dict>
+                    <key>pkgname</key>
+                    <string>%NAME%</string>
+                    <key>id</key>
+                    <string>com.cisco.jabber</string>
+                    <key>version</key>
+                    <string>%version%</string>
+                    <key>install_location</key>
+                    <string>/Applications</string>
+                </dict>
+                <key>pkgroot</key>
+                <string>%pkgroot%</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>EndOfCheckPhase</string>
+        </dict>
+    </array>
+</dict>
+</plist>
