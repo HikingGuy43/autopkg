@@ -3,22 +3,22 @@
 <plist version="1.0">
 	<dict>
 		<key>Description</key>
-		<string>Downloads the latest version of GIMP from gimp.org.
-
-This recipe supports two architecture values:
-	- x86_64
-	- arm64</string>
+		<string>Downloads the latest version of GIMP for macOS. Downloads both the ARM and Intel builds. Based on the recipes in `hjuutilainen-recipes`.</string>
 		<key>Identifier</key>
-		<string>io.github.sysco.download.GIMP</string>
+		<string>com.github.mlbz521.download.GIMP-Universal</string>
+		<key>MinimumVersion</key>
+		<string>2.3</string>
 		<key>Input</key>
 		<dict>
 			<key>NAME</key>
 			<string>GIMP</string>
-			<key>ARCH</key>
+			<key>PKG_NAME</key>
+			<string>GIMP (Universal)</string>
+			<key>ARM_ARCHITECTURE</key>
+			<string>arm64</string>
+			<key>INTEL_ARCHITECTURE</key>
 			<string>x86_64</string>
 		</dict>
-		<key>MinimumVersion</key>
-		<string>1.0.4</string>
 		<key>Process</key>
 		<array>
 			<dict>
@@ -26,10 +26,10 @@ This recipe supports two architecture values:
 				<string>URLTextSearcher</string>
 				<key>Arguments</key>
 				<dict>
-					<key>re_pattern</key>
-					<string>//download\.gimp\.org/gimp/v[0-9\.]*/macos/gimp-[0-9\.\-]*-%ARCH%\.dmg</string>
 					<key>url</key>
 					<string>https://www.gimp.org/downloads/</string>
+					<key>re_pattern</key>
+					<string>(?P&lt;url&gt;//download\.gimp\.org/gimp/v[0-9\.]*/macos/gimp-(?P&lt;version&gt;[0-9\.\-]+)-%ARM_ARCHITECTURE%\.dmg)</string>
 				</dict>
 			</dict>
 			<dict>
@@ -38,14 +38,54 @@ This recipe supports two architecture values:
 				<key>Arguments</key>
 				<dict>
 					<key>url</key>
-					<string>https:%match%</string>
-					<key>filename</key>
-					<string>%NAME%.dmg</string>
+					<string>https:%url%</string>
+					<key>prefetch_filename</key>
+					<true/>
 				</dict>
 			</dict>
 			<dict>
 				<key>Processor</key>
 				<string>EndOfCheckPhase</string>
+				<key>Arguments</key>
+				<dict>
+					<key>arm_path</key>
+					<string>%pathname%</string>
+					<key>arm_version</key>
+					<string>%version%</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>URLTextSearcher</string>
+				<key>Arguments</key>
+				<dict>
+					<key>url</key>
+					<string>https://www.gimp.org/downloads/</string>
+					<key>re_pattern</key>
+					<string>(?P&lt;url&gt;//download\.gimp\.org/gimp/v[0-9\.]*/macos/gimp-(?P&lt;version&gt;[0-9\.\-]+)-%INTEL_ARCHITECTURE%\.dmg)</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>URLDownloader</string>
+				<key>Arguments</key>
+				<dict>
+					<key>url</key>
+					<string>https:%url%</string>
+					<key>prefetch_filename</key>
+					<true/>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>EndOfCheckPhase</string>
+				<key>Arguments</key>
+				<dict>
+					<key>intel_path</key>
+					<string>%pathname%</string>
+					<key>intel_version</key>
+					<string>%version%</string>
+				</dict>
 			</dict>
 			<dict>
 				<key>Processor</key>
@@ -53,12 +93,25 @@ This recipe supports two architecture values:
 				<key>Arguments</key>
 				<dict>
 					<key>input_path</key>
-					<string>%pathname%/GIMP*.app</string>
+					<string>%arm_path%/GIMP*.app</string>
 					<key>requirement</key>
 					<string>identifier "org.gimp.gimp-2.10" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = T25BQ8HSJF</string>
-					<key>strict_verification</key>
-					<true />
 				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>CodeSignatureVerifier</string>
+				<key>Arguments</key>
+				<dict>
+					<key>input_path</key>
+					<string>%intel_path%/GIMP*.app</string>
+					<key>requirement</key>
+					<string>identifier "org.gimp.gimp-2.10" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = T25BQ8HSJF</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>EndOfCheckPhase</string>
 			</dict>
 		</array>
 	</dict>
