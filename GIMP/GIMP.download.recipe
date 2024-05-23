@@ -9,7 +9,7 @@ This recipe supports two architecture values:
 	- x86_64
 	- arm64</string>
 		<key>Identifier</key>
-		<string>io.github.hjuutilainen.download.GIMP</string>
+		<string>io.github.sysco.download.GIMP</string>
 		<key>Input</key>
 		<dict>
 			<key>NAME</key>
