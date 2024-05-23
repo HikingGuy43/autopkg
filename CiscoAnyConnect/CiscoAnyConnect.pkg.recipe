@@ -3,22 +3,27 @@
 <plist version="1.0">
 <dict>
     <key>Description</key>
-    <string>Creates a Cisco AnyConnect VPN-only package.</string>
+    <string>Packages Cisco AnyConnect into a .pkg with specific choices.</string>
     <key>Identifier</key>
-    <string>com.github.sysco.recipes.pkg.CiscoAnyConnect</string>
-    <key>MinimumVersion</key>
-    <string>2.3</string>
+    <string>com.github.sysco.pkg.CiscoAnyConnect</string>
     <key>Input</key>
     <dict>
-        <key>NAME</key>
-        <string>Cisco AnyConnect Secure Mobility Client</string>
-        <key>VPN_XML</key>
-        <string>Employee_1.0.xml</string>
-        <key>PROFILES</key>
-        <string>%RECIPE_DIR%/Profiles</string>
+        <key>DMG_PATH</key>
+        <string></string>
     </dict>
+    <key>MinimumVersion</key>
+    <string>2.0.0</string>
     <key>Process</key>
     <array>
+        <dict>
+            <key>Processor</key>
+            <string>DmgMounter</string>
+            <key>Arguments</key>
+            <dict>
+                <key>dmg_path</key>
+                <string>%DMG_PATH%</string>
+            </dict>
+        </dict>
         <dict>
             <key>Processor</key>
             <string>PkgRootCreator</string>
@@ -46,10 +51,10 @@
             <string>PkgCopier</string>
             <key>Arguments</key>
             <dict>
+                <key>source_pkg</key>
+                <string>%MOUNT_POINT%/AnyConnect.pkg</string>
                 <key>pkg_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/AnyConnect.pkg</string>
-                <key>source_pkg</key>
-                <string>%PKG%/AnyConnect.pkg</string>
             </dict>
         </dict>
         <dict>
@@ -57,10 +62,10 @@
             <string>FlatPkgUnpacker</string>
             <key>Arguments</key>
             <dict>
-                <key>destination_path</key>
-                <string>%RECIPE_CACHE_DIR%/unpack</string>
                 <key>flat_pkg_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/AnyConnect.pkg</string>
+                <key>destination_path</key>
+                <string>%RECIPE_CACHE_DIR%/unpack</string>
                 <key>purge_destination</key>
                 <true/>
             </dict>
@@ -70,10 +75,10 @@
             <string>PkgPayloadUnpacker</string>
             <key>Arguments</key>
             <dict>
-                <key>destination_path</key>
-                <string>%RECIPE_CACHE_DIR%/Payload</string>
                 <key>pkg_payload_path</key>
                 <string>%RECIPE_CACHE_DIR%/unpack/vpn_module.pkg/Payload</string>
+                <key>destination_path</key>
+                <string>%RECIPE_CACHE_DIR%/Payload</string>
                 <key>purge_destination</key>
                 <true/>
             </dict>
@@ -85,17 +90,6 @@
             <dict>
                 <key>input_plist_path</key>
                 <string>%RECIPE_CACHE_DIR%/Payload/Applications/Cisco/Cisco AnyConnect Secure Mobility Client.app/Contents/Info.plist</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>Copier</string>
-            <key>Arguments</key>
-            <dict>
-                <key>destination_path</key>
-                <string>%RECIPE_CACHE_DIR%/Scripts/Profiles/vpn/%VPN_XML%</string>
-                <key>source_path</key>
-                <string>%PROFILES%/%VPN_XML%</string>
             </dict>
         </dict>
         <dict>
@@ -125,22 +119,14 @@ fi
         </dict>
         <dict>
             <key>Processor</key>
-            <string>PkgCreator</string>
+            <string>FileCreator</string>
             <key>Arguments</key>
             <dict>
-                <key>pkg_request</key>
-                <dict>
-                    <key>pkgname</key>
-                    <string>CiscoAnyConnect-%version%</string>
-                    <key>id</key>
-                    <string>ch.ethz.id.pkg.CiscoAnyConnect</string>
-                    <key>version</key>
-                    <string>%version%</string>
-                    <key>pkgroot</key>
-                    <string>%RECIPE_CACHE_DIR%/pkgroot</string>
-                    <key>scripts</key>
-                    <string>Scripts</string>
-                    <key>installer_choices_xml</key>
+                <key>file_content</key>
+                <string>
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                    <plist version="1.0">
                     <array>
                         <dict>
                             <key>attributeSetting</key>
@@ -199,6 +185,29 @@ fi
                             <string>choice_umbrella</string>
                         </dict>
                     </array>
+                    </plist>
+                </string>
+                <key>file_path</key>
+                <string>%RECIPE_CACHE_DIR%/Scripts/choices.xml</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>PkgCreator</string>
+            <key>Arguments</key>
+            <dict>
+                <key>pkg_request</key>
+                <dict>
+                    <key>pkgname</key>
+                    <string>CiscoAnyConnect-%version%</string>
+                    <key>id</key>
+                    <string>com.cisco.pkg.CiscoAnyConnect</string>
+                    <key>version</key>
+                    <string>%version%</string>
+                    <key>pkgroot</key>
+                    <string>%RECIPE_CACHE_DIR%/pkgroot</string>
+                    <key>scripts</key>
+                    <string>%RECIPE_CACHE_DIR%/Scripts</string>
                 </dict>
             </dict>
         </dict>
