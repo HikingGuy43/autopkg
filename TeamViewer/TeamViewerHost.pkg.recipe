@@ -5,7 +5,7 @@
     <key>Description</key>
     <string>Downloads the current release version of TeamViewerHost and extracts the app information.</string>
     <key>Identifier</key>
-    <string>io.github.hjuutilainen.pkg.TeamViewerHost</string>
+    <string>io.github.sysco.pkg.TeamViewerHost</string>
     <key>Input</key>
     <dict>
         <key>NAME</key>
@@ -14,7 +14,7 @@
     <key>MinimumVersion</key>
     <string>0.2.0</string>
     <key>ParentRecipe</key>
-    <string>io.github.hjuutilainen.download.TeamViewerHost</string>
+    <string>io.github.sysco.download.TeamViewerHost</string>
     <key>Process</key>
     <array>
         <dict>
