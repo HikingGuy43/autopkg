@@ -7,7 +7,9 @@
         <key>NAME</key>
         <string>Cisco AnyConnect Secure Mobility Client</string>
         <key>VPN_XML</key>
-        <string>example.xml</string>
+        <string>Employee_1.0.xml</string>
+        <key>PROFILES</key>
+        <string>%RECIPE_DIR%/Profiles</string>
     </input>
     <process>
         <processor>PackageRequired</processor>
@@ -85,7 +87,7 @@
                 <key>destination_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/Profiles/vpn/%VPN_XML%</string>
                 <key>source_path</key>
-                <string>%RECIPE_DIR%/%VPN_XML%</string>
+                <string>%PROFILES%/%VPN_XML%</string>
             </dict>
         </arguments>
 
