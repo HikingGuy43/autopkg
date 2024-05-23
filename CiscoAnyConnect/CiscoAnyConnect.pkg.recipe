@@ -1,56 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<recipe xmlns="http://autopkg.github.io/autopkg/recipe">
-    <identifier>com.github.sysco.recipes.pkg.CiscoAnyConnect</identifier>
-    <minimum_version>2.3</minimum_version>
-    <description>Creates a Cisco AnyConnect VPN-only package.</description>
-    <input>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Description</key>
+    <string>Creates a Cisco AnyConnect VPN-only package.</string>
+    <key>Identifier</key>
+    <string>com.github.grahampugh.recipes.pkg.CiscoAnyConnect</string>
+    <key>MinimumVersion</key>
+    <string>2.3</string>
+    <key>Input</key>
+    <dict>
         <key>NAME</key>
         <string>Cisco AnyConnect Secure Mobility Client</string>
         <key>VPN_XML</key>
-        <string>Employee_1.0.xml</string>
+        <string>example.xml</string>
         <key>PROFILES</key>
-        <string>%RECIPE_DIR%/Profiles</string>
-    </input>
-    <process>
-        <processor>PackageRequired</processor>
-
-        <processor>PkgRootCreator</processor>
-        <arguments>
+        <string>%RECIPE_DIR%/CiscoSecureClientProfiles</string>
+    </dict>
+    <key>Process</key>
+    <array>
+        <dict>
+            <key>Processor</key>
+            <string>PkgRootCreator</string>
+            <key>Arguments</key>
             <dict>
+                <key>pkgroot</key>
+                <string>%RECIPE_CACHE_DIR%/pkgroot</string>
                 <key>pkgdirs</key>
                 <dict>
                     <key>Profiles</key>
-                    <string>0755</string>
+                    <dict>
+                        <key>mode</key>
+                        <integer>0755</integer>
+                    </dict>
                     <key>Profiles/vpn</key>
-                    <string>0755</string>
+                    <dict>
+                        <key>mode</key>
+                        <integer>0755</integer>
+                    </dict>
                 </dict>
-                <key>pkgroot</key>
-                <string>%RECIPE_CACHE_DIR%/Scripts</string>
             </dict>
-        </arguments>
-
-        <processor>PkgRootCreator</processor>
-        <arguments>
-            <dict>
-                <key>pkgdirs</key>
-                <dict/>
-                <key>pkgroot</key>
-                <string>%RECIPE_CACHE_DIR%/pkgroot</string>
-            </dict>
-        </arguments>
-
-        <processor>PkgCopier</processor>
-        <arguments>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>PkgCopier</string>
+            <key>Arguments</key>
             <dict>
                 <key>pkg_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/AnyConnect.pkg</string>
                 <key>source_pkg</key>
                 <string>%PKG%/AnyConnect.pkg</string>
             </dict>
-        </arguments>
-
-        <processor>FlatPkgUnpacker</processor>
-        <arguments>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>FlatPkgUnpacker</string>
+            <key>Arguments</key>
             <dict>
                 <key>destination_path</key>
                 <string>%RECIPE_CACHE_DIR%/unpack</string>
@@ -59,10 +64,11 @@
                 <key>purge_destination</key>
                 <true/>
             </dict>
-        </arguments>
-
-        <processor>PkgPayloadUnpacker</processor>
-        <arguments>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>PkgPayloadUnpacker</string>
+            <key>Arguments</key>
             <dict>
                 <key>destination_path</key>
                 <string>%RECIPE_CACHE_DIR%/Payload</string>
@@ -71,71 +77,69 @@
                 <key>purge_destination</key>
                 <true/>
             </dict>
-        </arguments>
-
-        <processor>Versioner</processor>
-        <arguments>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>Versioner</string>
+            <key>Arguments</key>
             <dict>
                 <key>input_plist_path</key>
                 <string>%RECIPE_CACHE_DIR%/Payload/Applications/Cisco/Cisco AnyConnect Secure Mobility Client.app/Contents/Info.plist</string>
             </dict>
-        </arguments>
-
-        <processor>Copier</processor>
-        <arguments>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>Copier</string>
+            <key>Arguments</key>
             <dict>
                 <key>destination_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/Profiles/vpn/%VPN_XML%</string>
                 <key>source_path</key>
                 <string>%PROFILES%/%VPN_XML%</string>
             </dict>
-        </arguments>
-
-        <processor>FileCreator</processor>
-        <arguments>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>FileCreator</string>
+            <key>Arguments</key>
             <dict>
                 <key>file_content</key>
-                <string>
-                    #!/bin/bash
-                    ## script to install and activate Cisco AnyConnect
+                <string># This script installs and activates Cisco AnyConnect
 
-                    DIR=$(dirname "$0")
+DIR=$(dirname "$0")
 
-                    /usr/sbin/installer -applyChoiceChangesXML "$DIR/choices.xml" -pkg "$DIR/AnyConnect.pkg" -target /
+/usr/sbin/installer -applyChoiceChangesXML "$DIR/choices.xml" -pkg "$DIR/AnyConnect.pkg" -target /
 
-                    if (test $? = 0) then
-                        echo "Cisco AnyConnect installed."
-                    else
-                        echo "ERROR: Cisco AnyConnect installation failed."
-                        exit 1
-                    fi
+if [ $? -eq 0 ]; then
+    echo "Cisco AnyConnect installed."
+else
+    echo "ERROR: Cisco AnyConnect installation failed."
+    exit 1
+fi
                 </string>
                 <key>file_mode</key>
                 <string>0755</string>
                 <key>file_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/postinstall</string>
             </dict>
-        </arguments>
-
-        <processor>PkgCreator</processor>
-        <arguments>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>PkgCreator</string>
+            <key>Arguments</key>
             <dict>
                 <key>pkg_request</key>
                 <dict>
-                    <key>chown</key>
-                    <array/>
-                    <key>id</key>
-                    <string>ch.ethz.id.pkg.CiscoAnyConnect</string>
                     <key>pkgname</key>
                     <string>CiscoAnyConnect-%version%</string>
-                    <key>pkgroot</key>
-                    <string>%RECIPE_CACHE_DIR%/pkgroot</string>
-                    <key>pkgtype</key>
-                    <string>flat</string>
-                    <key>scripts</key>
-                    <string>Scripts</string>
+                    <key>id</key>
+                    <string>ch.ethz.id.pkg.CiscoAnyConnect</string>
                     <key>version</key>
                     <string>%version%</string>
+                    <key>pkgroot</key>
+                    <string>%RECIPE_CACHE_DIR%/pkgroot</string>
+                    <key>scripts</key>
+                    <string>Scripts</string>
                     <key>installer_choices_xml</key>
                     <array>
                         <dict>
@@ -197,10 +201,11 @@
                     </array>
                 </dict>
             </dict>
-        </arguments>
-
-        <processor>PathDeleter</processor>
-        <arguments>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>PathDeleter</string>
+            <key>Arguments</key>
             <dict>
                 <key>path_list</key>
                 <array>
@@ -211,6 +216,7 @@
                     <string>%RECIPE_CACHE_DIR%/pkgroot</string>
                 </array>
             </dict>
-        </arguments>
-    </process>
-</recipe>
+        </dict>
+    </array>
+</dict>
+</plist>
