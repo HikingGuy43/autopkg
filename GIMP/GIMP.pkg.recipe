@@ -252,7 +252,7 @@ exit 0
                         <key>options</key>
                         <string>purge_ds_store</string>
                         <key>pkgname</key>
-                        <string>%PKG_NAME%-%version%</string>
+                        <string>%NAME%-%version%</string>
                         <key>pkgroot</key>
                         <string>%RECIPE_CACHE_DIR%/pkgroot</string>
                         <key>pkgtype</key>
