@@ -1,96 +1,292 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>Description</key>
-	<string>Downloads the latest version of GIMP from gimp.org and builds a package.</string>
-	<key>Identifier</key>
-	<string>io.github.sysco.pkg.GIMP</string>
-	<key>Input</key>
 	<dict>
-		<key>NAME</key>
-		<string>GIMP</string>
-	</dict>
-	<key>ParentRecipe</key>
-	<string>io.github.sysco.download.GIMP</string>
-	<key>MinimumVersion</key>
-	<string>1.0.4</string>
-	<key>Process</key>
-	<array>
+		<key>Description</key>
+		<string>Downloads the latest GIMP for both ARM and Intel and creates a package.
+
+The ARM and Intel version builds **must match** for a package to be created.
+
+Based on the recipes in `hjuutilainen-recipes`.</string>
+		<key>Identifier</key>
+		<string>com.github.sysco.pkg.GIMP-Universal</string>
+		<key>ParentRecipe</key>
+		<string>com.github.sysco.download.GIMP-Universal</string>
+		<key>MinimumVersion</key>
+		<string>2.3</string>
+		<key>Input</key>
 		<dict>
-			<key>Processor</key>
-			<string>AppDmgVersioner</string>
-			<key>Arguments</key>
-			<dict>
-				<key>dmg_path</key>
-				<string>%pathname%</string>
-			</dict>
+			<key>NAME</key>
+			<string>GIMP</string>
+			<key>PKG_NAME</key>
+			<string>GIMP (Universal)</string>
 		</dict>
-		<dict>
-			<key>Processor</key>
-			<string>PkgRootCreator</string>
-			<key>Arguments</key>
+		<key>Process</key>
+		<array>
 			<dict>
-				<key>pkgroot</key>
-				<string>%RECIPE_CACHE_DIR%/%NAME%</string>
-				<key>pkgdirs</key>
+				<key>Processor</key>
+				<string>AppDmgVersioner</string>
+				<key>Arguments</key>
 				<dict>
-					<key>Applications</key>
-					<string>0775</string>
+					<key>dmg_path</key>
+					<string>%arm_path%</string>
 				</dict>
 			</dict>
-		</dict>
-		<dict>
-			<key>Processor</key>
-			<string>Copier</string>
-			<key>Arguments</key>
 			<dict>
-				<key>source_path</key>
-				<string>%pathname%/GIMP*.app</string>
-				<key>destination_path</key>
-				<string>%pkgroot%/Applications/GIMP.app</string>
-			</dict>
-		</dict>
-		<dict>
-			<key>Processor</key>
-			<string>PkgCreator</string>
-			<key>Arguments</key>
-			<dict>
-				<key>pkg_request</key>
+				<key>Processor</key>
+				<string>EndOfCheckPhase</string>
+				<key>Arguments</key>
 				<dict>
-					<key>pkgname</key>
-					<string>%NAME%-%ARCH%-%version%</string>
-					<key>pkgdir</key>
-					<string>%RECIPE_CACHE_DIR%</string>
-					<key>id</key>
-					<string>org.gimp.gimp</string>
-					<key>options</key>
-					<string>purge_ds_store</string>
-					<key>chown</key>
+					<key>arm_version</key>
+					<string>%version%</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>AppDmgVersioner</string>
+				<key>Arguments</key>
+				<dict>
+					<key>dmg_path</key>
+					<string>%intel_path%</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>EndOfCheckPhase</string>
+				<key>Arguments</key>
+				<dict>
+					<key>intel_version</key>
+					<string>%version%</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>StopProcessingIf</string>
+				<key>Arguments</key>
+				<dict>
+					<key>predicate</key>
+					<string>"%intel_version%" != "%arm_version%"</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>PkgRootCreator</string>
+				<key>Arguments</key>
+				<dict>
+					<key>pkgroot</key>
+					<string>%RECIPE_CACHE_DIR%/pkgroot</string>
+					<key>pkgdirs</key>
+					<dict/>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>PkgRootCreator</string>
+				<key>Arguments</key>
+				<dict>
+					<key>pkgroot</key>
+					<string>%RECIPE_CACHE_DIR%/scripts</string>
+					<key>pkgdirs</key>
+					<dict/>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>Copier</string>
+				<key>Arguments</key>
+				<dict>
+					<key>source_path</key>
+					<string>%arm_path%/*.app</string>
+					<key>destination_path</key>
+					<string>%RECIPE_CACHE_DIR%/scripts/%ARM_ARCHITECTURE%/%app_name%</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>Copier</string>
+				<key>Arguments</key>
+				<dict>
+					<key>source_path</key>
+					<string>%intel_path%/*.app</string>
+					<key>destination_path</key>
+					<string>%RECIPE_CACHE_DIR%/scripts/%INTEL_ARCHITECTURE%/%app_name%</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>FileCreator</string>
+				<key>Arguments</key>
+				<dict>
+					<key>file_path</key>
+					<string>%RECIPE_CACHE_DIR%/scripts/preinstall</string>
+					<key>file_mode</key>
+					<string>0755</string>
+					<key>file_content</key>
+					<string># !/bin/bash
+
+###################################################################################################
+# Script Name: Uninstall-UniversalApp.sh
+# By: Zack Thompson / Created: 08/05/2023
+# Version: 1.0.0 / Updated: 08/05/2023 / By: ZT
+#
+# Description: "Uninstalls" the app bundle.
+#
+###################################################################################################
+
+echo -e "***** Uninstall %NAME% Process: START *****\n"
+
+##################################################
+# Define Variables
+
+app_name="%app_name%"
+
+##################################################
+# Bits staged...
+
+if [[ $3 != "/" ]]; then
+    echo "[ERROR] Target disk is not the startup disk."
+    echo -e "\n***** Install %NAME% Process: FAILED *****"
+    exit 1
+fi
+
+# Check if app is currently installed...
+if [[ -e "/Applications/${app_name}" ]]; then
+
+    echo "\`${app_name}\` is currently installed; removing this instance before continuing..."
+    /bin/rm -rf "/Applications/${app_name}"
+    exitCode=$?
+    /bin/sleep 1
+
+    if [[ $exitCode != 0 ]]; then
+        echo "[ERROR] Uninstall failed!"
+        echo "[Exit Code] ${exitCode}"
+        echo -e "\n***** Install %NAME% Process: FAILED *****"
+        exit 1
+    fi
+
+    echo "\`${app_name}\` has been removed."
+
+fi
+
+echo -e "\n***** Uninstall %NAME% Process: COMPLETE *****"
+exit 0
+					</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>FileCreator</string>
+				<key>Arguments</key>
+				<dict>
+					<key>file_path</key>
+					<string>%RECIPE_CACHE_DIR%/scripts/postinstall</string>
+					<key>file_mode</key>
+					<string>0755</string>
+					<key>file_content</key>
+					<string># !/bin/bash
+
+###################################################################################################
+# Script Name: Install-UniversalApp.sh
+# By: Zack Thompson / Created: 11/10/2022
+# Version: 1.1.0 / Updated: 12/5/2022 / By: ZT
+#
+# Description: "Installs" the appropriate app bundle based on the systems' architecture.
+#
+###################################################################################################
+
+echo -e "***** Install %NAME% Process: START *****\n"
+
+##################################################
+# Define Variables
+
+app_name="%app_name%"
+
+# Set working directory
+pkg_dir=$( /usr/bin/dirname "${0}" )
+
+if [[ $( /usr/bin/arch ) == "arm64" ]]; then
+    app="%ARM_ARCHITECTURE%/${app_name}"
+else
+    app="%INTEL_ARCHITECTURE%/${app_name}"
+fi
+
+##################################################
+# Bits staged...
+
+if [[ $3 != "/" ]]; then
+    echo "[ERROR] Target disk is not the startup disk."
+    echo -e "\n***** Install %NAME% Process: FAILED *****"
+    exit 1
+fi
+
+# Install App
+echo "Installing..."
+/bin/mv -f "${pkg_dir}/${app}" "/Applications/${app_name}"
+exitCode=$?
+/bin/sleep 1
+
+if [[ $exitCode != 0 ]]; then
+    echo "[ERROR] Install failed!"
+    echo "[Exit Code] ${exitCode}"
+    echo -e "\n***** Install %NAME% Process: FAILED *****"
+    exit 1
+fi
+
+chown -R root:admin "/Applications/${app_name}"
+chmod -R 0775 "/Applications/${app_name}"
+
+echo -e "\n***** Install %NAME% Process: COMPLETE *****"
+exit 0
+					</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>PkgCreator</string>
+				<key>Arguments</key>
+				<dict>
+					<key>pkg_request</key>
+					<dict>
+						<key>id</key>
+						<string>org.gimp.gimp</string>
+						<key>options</key>
+						<string>purge_ds_store</string>
+						<key>pkgname</key>
+						<string>%NAME%-%version%</string>
+						<key>pkgroot</key>
+						<string>%RECIPE_CACHE_DIR%/pkgroot</string>
+						<key>pkgtype</key>
+						<string>flat</string>
+						<key>scripts</key>
+						<string>%RECIPE_CACHE_DIR%/scripts</string>
+						<key>version</key>
+						<string>%version%</string>
+					</dict>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>com.github.mlbz521.SharedProcessors/RenamePath</string>
+				<key>Arguments</key>
+				<dict>
+					<key>source_path</key>
+					<string>%RECIPE_CACHE_DIR%/%NAME%-%version%.pkg</string>
+					<key>new_name</key>
+					<string>%RECIPE_CACHE_DIR%/%PKG_NAME%-%version%.pkg</string>
+				</dict>
+			</dict>
+			<dict>
+				<key>Processor</key>
+				<string>PathDeleter</string>
+				<key>Arguments</key>
+				<dict>
+					<key>path_list</key>
 					<array>
-						<dict>
-							<key>path</key>
-							<string>Applications</string>
-							<key>user</key>
-							<string>root</string>
-							<key>group</key>
-							<string>admin</string>
-						</dict>
+						<string>%RECIPE_CACHE_DIR%/pkgroot</string>
+						<string>%RECIPE_CACHE_DIR%/scripts</string>
 					</array>
 				</dict>
 			</dict>
-		</dict>
-		<dict>
-			<key>Processor</key>
-			<string>PathDeleter</string>
-			<key>Arguments</key>
-			<dict>
-				<key>path_list</key>
-				<array>
-					<string>%pkgroot%</string>
-				</array>
-			</dict>
-		</dict>
-	</array>
-</dict>
+		</array>
+	</dict>
 </plist>
