@@ -2,19 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Description of the recipe -->
     <key>Description</key>
     <string>Packages Cisco AnyConnect into a .pkg with specific choices.</string>
+    <!-- Unique identifier for the package -->
     <key>Identifier</key>
     <string>com.github.sysco.pkg.CiscoAnyConnect</string>
+    <!-- Input parameters for the recipe -->
     <key>Input</key>
     <dict>
         <key>DMG_PATH</key>
         <string></string>
     </dict>
+    <!-- Minimum version required for the recipe -->
     <key>MinimumVersion</key>
     <string>2.0.0</string>
+    <!-- Recipe processing steps -->
     <key>Process</key>
     <array>
+        <!-- Mount the disk image -->
         <dict>
             <key>Processor</key>
             <string>DmgMounter</string>
@@ -24,6 +30,7 @@
                 <string>%DMG_PATH%</string>
             </dict>
         </dict>
+        <!-- Create package root -->
         <dict>
             <key>Processor</key>
             <string>PkgRootCreator</string>
@@ -41,6 +48,7 @@
                 </dict>
             </dict>
         </dict>
+        <!-- Copy AnyConnect package -->
         <dict>
             <key>Processor</key>
             <string>Copier</string>
@@ -52,6 +60,7 @@
                 <string>%RECIPE_CACHE_DIR%/Scripts/AnyConnect.pkg</string>
             </dict>
         </dict>
+        <!-- Unpack flat package -->
         <dict>
             <key>Processor</key>
             <string>FlatPkgUnpacker</string>
@@ -65,6 +74,7 @@
                 <true/>
             </dict>
         </dict>
+        <!-- Unpack package payload -->
         <dict>
             <key>Processor</key>
             <string>PkgPayloadUnpacker</string>
@@ -78,6 +88,7 @@
                 <true/>
             </dict>
         </dict>
+        <!-- Extract version information -->
         <dict>
             <key>Processor</key>
             <string>Versioner</string>
@@ -89,13 +100,16 @@
                 <string>CFBundleShortVersionString</string>
             </dict>
         </dict>
+        <!-- Create post-installation script -->
         <dict>
             <key>Processor</key>
             <string>FileCreator</string>
             <key>Arguments</key>
             <dict>
                 <key>file_content</key>
-                <string># This script installs and activates Cisco AnyConnect
+                <string><![CDATA[
+#!/bin/bash
+# This script installs and activates Cisco AnyConnect
 
 DIR=$(dirname "$0")
 
@@ -107,13 +121,14 @@ else
     echo "ERROR: Cisco AnyConnect installation failed."
     exit 1
 fi
-                </string>
+                ]]></string>
                 <key>file_mode</key>
                 <string>0755</string>
                 <key>file_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/postinstall</string>
             </dict>
         </dict>
+        <!-- Create choices XML -->
         <dict>
             <key>Processor</key>
             <string>FileCreator</string>
@@ -121,73 +136,75 @@ fi
             <dict>
                 <key>file_content</key>
                 <string><![CDATA[
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-                    <plist version="1.0">
-                    <array>
-                        <dict>
-                            <key>attributeSetting</key>
-                            <integer>1</integer>
-                            <key>choiceAttribute</key>
-                            <string>selected</string>
-                            <key>choiceIdentifier</key>
-                            <string>choice_vpn</string>
-                        </dict>
-                        <dict>
-                            <key>attributeSetting</key>
-                            <integer>0</integer>
-                            <key>choiceAttribute</key>
-                            <string>selected</string>
-                            <key>choiceIdentifier</key>
-                            <string>choice_fireamp</string>
-                        </dict>
-                        <dict>
-                            <key>attributeSetting</key>
-                            <integer>0</integer>
-                            <key>choiceAttribute</key>
-                            <string>selected</string>
-                            <key>choiceIdentifier</key>
-                            <string>choice_dart</string>
-                        </dict>
-                        <dict>
-                            <key>attributeSetting</key>
-                            <integer>0</integer>
-                            <key>choiceAttribute</key>
-                            <string>selected</string>
-                            <key>choiceIdentifier</key>
-                            <string>choice_posture</string>
-                        </dict>
-                        <dict>
-                            <key>attributeSetting</key>
-                            <integer>0</integer>
-                            <key>choiceAttribute</key>
-                            <string>selected</string>
-                            <key>choiceIdentifier</key>
-                            <string>choice_iseposture</string>
-                        </dict>
-                        <dict>
-                            <key>attributeSetting</key>
-                            <integer>0</integer>
-                            <key>choiceAttribute</key>
-                            <string>selected</string>
-                            <key>choiceIdentifier</key>
-                            <string>choice_nvm</string>
-                        </dict>
-                        <dict>
-                            <key>attributeSetting</key>
-                            <integer>0</integer>
-                            <key>choiceAttribute</key>
-                            <string>selected</string>
-                            <key>choiceIdentifier</key>
-                            <string>choice_umbrella</string>
-                        </dict>
-                    </array>
-                    </plist>
-                ]]></string>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+    <!-- Define choices for installation -->
+    <dict>
+        <key>attributeSetting</key>
+        <integer>1</integer>
+        <key>choiceAttribute</key>
+        <string>selected</string>
+        <key>choiceIdentifier</key>
+        <string>choice_vpn</string>
+    </dict>
+    <dict>
+        <key>attributeSetting</key>
+        <integer>0</integer>
+        <key>choiceAttribute</key>
+        <string>selected</string>
+        <key>choiceIdentifier</key>
+        <string>choice_fireamp</string>
+    </dict>
+    <dict>
+        <key>attributeSetting</key>
+        <integer>0</integer>
+        <key>choiceAttribute</key>
+        <string>selected</string>
+        <key>choiceIdentifier</key>
+        <string>choice_dart</string>
+    </dict>
+    <dict>
+        <key>attributeSetting</key>
+        <integer>0</integer>
+        <key>choiceAttribute</key>
+        <string>selected</string>
+        <key>choiceIdentifier</key>
+        <string>choice_posture</string>
+    </dict>
+    <dict>
+        <key>attributeSetting</key>
+        <integer>0</integer>
+        <key>choiceAttribute</key>
+        <string>selected</string>
+        <key>choiceIdentifier</key>
+        <string>choice_iseposture</string>
+    </dict>
+    <dict>
+        <key>attributeSetting</key>
+        <integer>0</integer>
+        <key>choiceAttribute</key>
+        <string>selected</string>
+        <key>choiceIdentifier</key>
+        <string>choice_nvm</
+    ></dict>
+    <dict>
+        <key>attributeSetting</key>
+        <integer>0</integer>
+        <key>choiceAttribute</key>
+        <string>selected</string>
+        <key>choiceIdentifier</key>
+        <string>choice_umbrella</string>
+    </dict>
+</array>
+</plist>
+]]></string>
                 <key>file_path</key>
                 <string>%RECIPE_CACHE_DIR%/Scripts/choices.xml</string>
             </dict>
         </dict>
+        <!-- Create package -->
         <dict>
             <key>Processor</key>
             <string>PkgCreator</string>
@@ -210,6 +227,7 @@ fi
                 <string>%RECIPE_CACHE_DIR%/pkgroot</string>
             </dict>
         </dict>
+        <!-- Clean up -->
         <dict>
             <key>Processor</key>
             <string>PathDeleter</string>
