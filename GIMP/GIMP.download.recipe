@@ -5,7 +5,7 @@
 		<key>Description</key>
 		<string>Downloads the latest version of GIMP for macOS. Downloads both the ARM and Intel builds. Based on the recipes in `hjuutilainen-recipes`.</string>
 		<key>Identifier</key>
-		<string>com.github.mlbz521.download.GIMP-Universal</string>
+		<string>com.github.sysco.download.GIMP-Universal</string>
 		<key>MinimumVersion</key>
 		<string>2.3</string>
 		<key>Input</key>
