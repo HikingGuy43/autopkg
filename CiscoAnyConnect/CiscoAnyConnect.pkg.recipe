@@ -33,15 +33,10 @@
                 <string>%RECIPE_CACHE_DIR%/pkgroot</string>
                 <key>pkgdirs</key>
                 <dict>
-                    <key>Profiles</key>
+                    <key>Applications</key>
                     <dict>
                         <key>mode</key>
-                        <string>0755</string>
-                    </dict>
-                    <key>Profiles/vpn</key>
-                    <dict>
-                        <key>mode</key>
-                        <string>0755</string>
+                        <integer>0755</integer>
                     </dict>
                 </dict>
             </dict>
@@ -123,8 +118,7 @@ fi
             <key>Arguments</key>
             <dict>
                 <key>file_content</key>
-                <string>
-                    <?xml version="1.0" encoding="UTF-8"?>
+                <string><?xml version="1.0" encoding="UTF-8"?>
                     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
                     <plist version="1.0">
                     <array>
@@ -218,7 +212,7 @@ fi
             <dict>
                 <key>path_list</key>
                 <array>
-                    <string>%RECIPE_CACHE_DIR%/AnyConnect.pkg</string>
+                    <string>%RECIPE_CACHE_DIR%/Scripts/AnyConnect.pkg</string>
                     <string>%RECIPE_CACHE_DIR%/unpack</string>
                     <string>%RECIPE_CACHE_DIR%/Payload</string>
                     <string>%RECIPE_CACHE_DIR%/Scripts</string>
