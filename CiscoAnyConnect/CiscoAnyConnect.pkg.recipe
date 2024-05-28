@@ -17,7 +17,7 @@
     <array>
         <dict>
             <key>Processor</key>
-            <string>DmgMounter</string>
+            <string>Mount</string>
             <key>Arguments</key>
             <dict>
                 <key>dmg_path</key>
