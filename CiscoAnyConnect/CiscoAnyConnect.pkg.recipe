@@ -2,72 +2,45 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>Description</key>
-    <string>Creates a PKG from a specified AnyConnect DMG file.</string>
     <key>Identifier</key>
-    <string>com.example.pkg.anyconnect</string>
-    <key>MinimumVersion</key>
-    <string>1.0.0</string>
+    <string>com.github.sysco.download.AnyConnect</string>
+    <key>Description</key>
+    <string>Copies the latest version of Cisco AnyConnect from a network share or folder.</string>
     <key>Input</key>
     <dict>
-        <key>dmg_path</key>
-        <string></string>
+        <key>NAME</key>
+        <string>AnyConnect</string>
+        <key>SOURCE_PATH</key>
+        <string>"/Users/ddal1000/Library/CloudStorage/OneDrive-SyscoCorporation/Documents/Workspace ONE Admin Assistant/AnyConnect-4.10.08029/AnyConnect-4.10.08029.dmg"</string> <!-- Replace with the actual path -->
     </dict>
     <key>Process</key>
     <array>
-        <dict>
-            <key>Processor</key>
-            <string>DmgMounter</string>
-            <key>Arguments</key>
-            <dict>
-                <key>dmg_path</key>
-                <string>%dmg_path%</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>Versioner</string>
-            <key>Arguments</key>
-            <dict>
-                <key>input_plist_path</key>
-                <string>%mount_point%/AnyConnect.app/Contents/Info.plist</string>
-                <key>plist_version_key</key>
-                <string>CFBundleShortVersionString</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>PkgRootCreator</string>
-            <key>Arguments</key>
-            <dict>
-                <key>pkgroot</key>
-                <string>%RECIPE_CACHE_DIR%/AnyConnect</string>
-            </dict>
-        </dict>
         <dict>
             <key>Processor</key>
             <string>Copier</string>
             <key>Arguments</key>
             <dict>
                 <key>source_path</key>
-                <string>%mount_point%/AnyConnect.app</string>
+                <string>%SOURCE_PATH%</string>
                 <key>destination_path</key>
-                <string>%pkgroot%/Applications/AnyConnect.app</string>
+                <string>%RECIPE_CACHE_DIR%/%NAME%.dmg</string>
             </dict>
         </dict>
         <dict>
             <key>Processor</key>
-            <string>PkgCreator</string>
+            <string>EndOfCheckPhase</string>
+            <key>Arguments</key>
+            <dict/>
+        </dict>
+        <dict>
+            <key>Processor</key>
+            <string>CodeSignatureVerifier</string>
             <key>Arguments</key>
             <dict>
-                <key>pkgroot</key>
-                <string>%RECIPE_CACHE_DIR%/AnyConnect</string>
-                <key>pkgname</key>
-                <string>AnyConnect</string>
-                <key>version</key>
-                <string>%version%</string>
-                <key>id</key>
-                <string>com.example.pkg.anyconnect</string>
+                <key>input_path</key>
+                <string>%RECIPE_CACHE_DIR%/%NAME%.dmg</string>
+                <key>requirement</key>
+                <string>identifier "com.cisco.pkg.anyconnect" and anchor apple generic and certificate leaf[subject.OU] = "4U49YY6Q5E"</string>
             </dict>
         </dict>
     </array>
