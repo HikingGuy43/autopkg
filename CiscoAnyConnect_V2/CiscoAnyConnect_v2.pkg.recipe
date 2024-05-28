@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Identifier</key>
+    <string>com.github.sysco.pkg.anyconnect</string>
+    <key>Description</key>
+    <string>Convert AnyConnect DMG to PKG</string>
+    <key>MinimumVersion</key>
+    <string>1.0</string>
+    <key>Input</key>
+    <dict>
+        <key>dmg_path</key>
+        <string></string>
+        <key>version</key>
+        <string></string>
+    </dict>
+    <key>Process</key>
+    <array>
+        <dict>
+            <key>Processor</key>
+            <string>PkgCreator</string>
+            <key>Arguments</key>
+            <dict>
+                <key>pkgroot</key>
+                <string>%RECIPE_CACHE_DIR%/AnyConnect</string>
+                <key>pkgname</key>
+                <string>AnyConnect</string>
+                <key>version</key>
+                <string>%version%</string>
+                <key>id</key>
+                <string>com.github.sysco.pkg.anyconnect</string>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>
