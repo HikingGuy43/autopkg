@@ -3,16 +3,16 @@
 <plist version="1.0">
 <dict>
     <key>Description</key>
-    <string>Packages Cisco AnyConnect into a .pkg with specific choices.</string>
+    <string>Creates a PKG from a specified AnyConnect DMG file.</string>
     <key>Identifier</key>
-    <string>com.github.sysco.pkg.CiscoAnyConnect</string>
+    <string>com.example.pkg.anyconnect</string>
+    <key>MinimumVersion</key>
+    <string>1.0.0</string>
     <key>Input</key>
     <dict>
-        <key>DMG_PATH</key>
+        <key>dmg_path</key>
         <string></string>
     </dict>
-    <key>MinimumVersion</key>
-    <string>2.0.0</string>
     <key>Process</key>
     <array>
         <dict>
@@ -21,61 +21,7 @@
             <key>Arguments</key>
             <dict>
                 <key>dmg_path</key>
-                <string>%DMG_PATH%</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>PkgRootCreator</string>
-            <key>Arguments</key>
-            <dict>
-                <key>pkgroot</key>
-                <string>%RECIPE_CACHE_DIR%/pkgroot</string>
-                <key>pkgdirs</key>
-                <dict>
-                    <key>Applications</key>
-                    <dict>
-                        <key>mode</key>
-                        <integer>0755</integer>
-                    </dict>
-                </dict>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>Copier</string>
-            <key>Arguments</key>
-            <dict>
-                <key>source_path</key>
-                <string>%MOUNT_POINT%/AnyConnect.pkg</string>
-                <key>destination_path</key>
-                <string>%RECIPE_CACHE_DIR%/Scripts/AnyConnect.pkg</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>FlatPkgUnpacker</string>
-            <key>Arguments</key>
-            <dict>
-                <key>flat_pkg_path</key>
-                <string>%RECIPE_CACHE_DIR%/Scripts/AnyConnect.pkg</string>
-                <key>destination_path</key>
-                <string>%RECIPE_CACHE_DIR%/unpack</string>
-                <key>purge_destination</key>
-                <true/>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>PkgPayloadUnpacker</string>
-            <key>Arguments</key>
-            <dict>
-                <key>pkg_payload_path</key>
-                <string>%RECIPE_CACHE_DIR%/unpack/vpn_module.pkg/Payload</string>
-                <key>destination_path</key>
-                <string>%RECIPE_CACHE_DIR%/Payload</string>
-                <key>purge_destination</key>
-                <true/>
+                <string>%dmg_path%</string>
             </dict>
         </dict>
         <dict>
@@ -84,110 +30,29 @@
             <key>Arguments</key>
             <dict>
                 <key>input_plist_path</key>
-                <string>%RECIPE_CACHE_DIR%/Payload/Applications/Cisco/Cisco AnyConnect Secure Mobility Client.app/Contents/Info.plist</string>
+                <string>%mount_point%/AnyConnect.app/Contents/Info.plist</string>
                 <key>plist_version_key</key>
                 <string>CFBundleShortVersionString</string>
             </dict>
         </dict>
         <dict>
             <key>Processor</key>
-            <string>FileCreator</string>
+            <string>PkgRootCreator</string>
             <key>Arguments</key>
             <dict>
-                <key>file_content</key>
-                <string><![CDATA[
-#!/bin/bash
-# This script installs and activates Cisco AnyConnect
-
-DIR=$(dirname "$0")
-
-/usr/sbin/installer -applyChoiceChangesXML "$DIR/choices.xml" -pkg "$DIR/AnyConnect.pkg" -target /
-
-if [ $? -eq 0 ]; then
-    echo "Cisco AnyConnect installed."
-else
-    echo "ERROR: Cisco AnyConnect installation failed."
-    exit 1
-fi
-                ]]></string>
-                <key>file_mode</key>
-                <string>0755</string>
-                <key>file_path</key>
-                <string>%RECIPE_CACHE_DIR%/Scripts/postinstall</string>
+                <key>pkgroot</key>
+                <string>%RECIPE_CACHE_DIR%/AnyConnect</string>
             </dict>
         </dict>
         <dict>
             <key>Processor</key>
-            <string>FileCreator</string>
+            <string>Copier</string>
             <key>Arguments</key>
             <dict>
-                <key>file_content</key>
-                <string><![CDATA[
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<array>
-    <dict>
-        <key>attributeSetting</key>
-        <integer>1</integer>
-        <key>choiceAttribute</key>
-        <string>selected</string>
-        <key>choiceIdentifier</key>
-        <string>choice_vpn</string>
-    </dict>
-    <dict>
-        <key>attributeSetting</key>
-        <integer>0</integer>
-        <key>choiceAttribute</key>
-        <string>selected</string>
-        <key>choiceIdentifier</key>
-        <string>choice_fireamp</string>
-    </dict>
-    <dict>
-        <key>attributeSetting</key>
-        <integer>0</integer>
-        <key>choiceAttribute</key>
-        <string>selected</string>
-        <key>choiceIdentifier</key>
-        <string>choice_dart</string>
-    </dict>
-    <dict>
-        <key>attributeSetting</key>
-        <integer>0</integer>
-        <key>choiceAttribute</key>
-        <string>selected</string>
-        <key>choiceIdentifier</key>
-        <string>choice_posture</string>
-    </dict>
-    <dict>
-        <key>attributeSetting</key>
-        <integer>0</integer>
-        <key>choiceAttribute</key>
-        <string>selected</string>
-        <key>choiceIdentifier</key>
-        <string>choice_iseposture</string>
-    </dict>
-    <dict>
-        <key>attributeSetting</key>
-        <integer>0</integer>
-        <key>choiceAttribute</key>
-        <string>selected</string>
-        <key>choiceIdentifier</key>
-        <string>choice_nvm</string>
-    </dict>
-    <dict>
-        <key>attributeSetting</key>
-        <integer>0</integer>
-        <key>choiceAttribute</key>
-        <string>selected</string>
-        <key>choiceIdentifier</key>
-        <string>choice_umbrella</string>
-    </dict>
-</array>
-</plist>
-                ]]></string>
-                <key>file_path</key>
-                <string>%RECIPE_CACHE_DIR%/Scripts/choices.xml</string>
+                <key>source_path</key>
+                <string>%mount_point%/AnyConnect.app</string>
+                <key>destination_path</key>
+                <string>%pkgroot%/Applications/AnyConnect.app</string>
             </dict>
         </dict>
         <dict>
@@ -195,36 +60,14 @@ fi
             <string>PkgCreator</string>
             <key>Arguments</key>
             <dict>
-                <key>pkg_request</key>
-                <dict>
-                    <key>pkgname</key>
-                    <string>CiscoAnyConnect-%version%</string>
-                    <key>id</key>
-                    <string>com.cisco.pkg.CiscoAnyConnect</string>
-                    <key>version</key>
-                    <string>%version%</string>
-                    <key>install_location</key>
-                    <string>/Applications</string>
-                    <key>scripts</key>
-                    <string>%RECIPE_CACHE_DIR%/Scripts</string>
-                </dict>
                 <key>pkgroot</key>
-                <string>%RECIPE_CACHE_DIR%/pkgroot</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>PathDeleter</string>
-            <key>Arguments</key>
-            <dict>
-                <key>path_list</key>
-                <array>
-                    <string>%RECIPE_CACHE_DIR%/Scripts/AnyConnect.pkg</string>
-                    <string>%RECIPE_CACHE_DIR%/unpack</string>
-                    <string>%RECIPE_CACHE_DIR%/Payload</string>
-                    <string>%RECIPE_CACHE_DIR%/Scripts</string>
-                    <string>%RECIPE_CACHE_DIR%/pkgroot</string>
-                </array>
+                <string>%RECIPE_CACHE_DIR%/AnyConnect</string>
+                <key>pkgname</key>
+                <string>AnyConnect</string>
+                <key>version</key>
+                <string>%version%</string>
+                <key>id</key>
+                <string>com.example.pkg.anyconnect</string>
             </dict>
         </dict>
     </array>
