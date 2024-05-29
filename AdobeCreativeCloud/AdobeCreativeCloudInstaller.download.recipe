@@ -2,16 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Description of the script -->
     <key>Description</key>
     <string>Downloads the latest version of Adobe's Creative Cloud Desktop App Installer.
     Set the ARCHITECTURE override to "osx10" to download the Intel or "macarm64" for Apple Silicon.</string>
-    
-    <!-- Identifier for the script -->
     <key>Identifier</key>
     <string>com.github.rtrouton.download.AdobeCreativeCloudInstaller</string>
-    
-    <!-- Input variables for the script -->
     <key>Input</key>
     <dict>
         <key>NAME</key>
@@ -25,19 +20,14 @@
         <key>SEARCH_URL</key>
         <string>https://helpx.adobe.com/download-install/kb/creative-cloud-desktop-app-download.html</string>
         <key>SEARCH_PATTERN</key>
-        <string>(?&lt;url&gt;http.*?://ccmdls.adobe.com/AdobeProducts/StandaloneBuilds/ACCC/ESD/.*?/%ARCHITECTURE%/ACCC.*?.dmg)</string>
+        <string>(?P&lt;url&gt;https://ccmdls.adobe.com/AdobeProducts/StandaloneBuilds/ACCC/ESD/.*?/%ARCHITECTURE%/ACCC.*?\.dmg)</string>
         <key>ARCHITECTURE</key>
         <string>osx10</string>
     </dict>
-    
-    <!-- Minimum version required for the script to run -->
     <key>MinimumVersion</key>
     <string>1.0.0</string>
-    
-    <!-- Process to download and verify the installer -->
     <key>Process</key>
     <array>
-        <!-- Step 1: Search for the download URL -->
         <dict>
             <key>Processor</key>
             <string>URLTextSearcher</string>
@@ -49,8 +39,6 @@
                 <string>%SEARCH_PATTERN%</string>
             </dict>
         </dict>
-        
-        <!-- Step 2: Download the installer -->
         <dict>
             <key>Processor</key>
             <string>URLDownloader</string>
@@ -60,17 +48,11 @@
                 <string>%url%</string>
             </dict>
         </dict>
-        
-        <!-- Step 3: End of the check phase -->
         <dict>
             <key>Processor</key>
             <string>EndOfCheckPhase</string>
         </dict>
-        
-        <!-- Step 4: Verify the code signature of the installer -->
         <dict>
-            <key>Processor</key>
-            <string>CodeSignatureVerifier</string>
             <key>Arguments</key>
             <dict>
                 <key>expected_authority_names</key>
@@ -82,12 +64,10 @@
                 <key>input_path</key>
                 <string>%pathname%/Install.app</string>
             </dict>
-        </dict>
-        
-        <!-- Step 5: Copy the ApplicationInfo.xml file -->
-        <dict>
             <key>Processor</key>
-            <string>Copier</string>
+            <string>CodeSignatureVerifier</string>
+        </dict>
+        <dict>
             <key>Arguments</key>
             <dict>
                 <key>source_path</key>
@@ -97,12 +77,10 @@
                 <key>overwrite</key>
                 <true/>
             </dict>
-        </dict>
-        
-        <!-- Step 6: Read the version information from the XML -->
-        <dict>
             <key>Processor</key>
-            <string>XMLReader</string>
+            <string>Copier</string>
+        </dict>
+        <dict>
             <key>Arguments</key>
             <dict>
                 <key>xml_path</key>
@@ -117,6 +95,8 @@
                     </dict>
                 </array>
             </dict>
+            <key>Processor</key>
+            <string>XMLReader</string>
         </dict>
     </array>
 </dict>
